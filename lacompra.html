@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="La Compra"/>
+<meta name="theme-color" content="#080f0c"/>
+<title>La Compra</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080f0c;--card:#0d1610;--card2:#111d14;--border:#1a2e1e;
+  --text:#e8f5ec;--muted:#4a6b52;--dim:#1e3024;
+  --green:#4ade80;--green2:#22c55e;--green3:#16a34a;
+  --gold:#fbbf24;--blue:#60a5fa;--red:#f87171;--purple:#a78bfa;--teal:#2dd4bf;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;}
+body{display:flex;flex-direction:column;align-items:center;padding:24px 14px 100px;}
+.wrap{width:100%;max-width:440px;}
+
+.header{margin-bottom:20px;}
+.app-title{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
+.app-title span{color:var(--green);}
+.app-sub{font-size:10px;color:var(--muted);letter-spacing:3px;margin-top:3px;}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:5px;}
+.tab{flex:1;padding:9px;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;transition:all 0.2s;color:var(--muted);background:none;letter-spacing:0.5px;}
+.tab.active{background:var(--green2);color:#030e06;}
+
+/* ===== LISTA ===== */
+.add-row{display:flex;gap:8px;margin-bottom:10px;}
+.add-input{flex:1;background:#060e08;border:1px solid var(--border);border-radius:12px;color:var(--text);padding:12px 14px;font-size:15px;font-family:inherit;outline:none;transition:border 0.2s;}
+.add-input:focus{border-color:#4ade8044;}
+.btn-add-item{background:var(--green2);border:none;border-radius:12px;color:#030e06;padding:12px 18px;font-size:15px;font-weight:900;font-family:inherit;cursor:pointer;transition:all 0.2s;}
+.btn-add-item:hover{opacity:0.85;}
+
+/* Quick add suggestions */
+.suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.sug-btn{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.sug-btn:hover{border-color:var(--green);color:var(--green);}
+
+/* List sections */
+.list-section{margin-bottom:14px;}
+.list-section-title{font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;padding-left:2px;}
+.item-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:7px;cursor:pointer;transition:all 0.2s;user-select:none;}
+.item-row:hover{background:var(--card2);}
+.item-row.done{opacity:0.5;background:var(--dim);}
+.item-check{width:24px;height:24px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;font-size:14px;}
+.item-row.done .item-check{background:var(--green3);border-color:var(--green3);}
+.item-name{flex:1;font-size:14px;font-weight:700;transition:all 0.2s;}
+.item-row.done .item-name{text-decoration:line-through;color:var(--muted);}
+.item-qty{font-size:11px;color:var(--muted);background:var(--dim);border-radius:6px;padding:2px 7px;margin-right:4px;}
+.btn-del-item{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:3px;border-radius:4px;transition:color 0.15s;line-height:1;}
+.btn-del-item:hover{color:var(--red);}
+
+.empty-list{padding:24px;text-align:center;color:var(--dim);font-size:12px;letter-spacing:1px;}
+
+/* Counter bar */
+.counter-bar{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 16px;margin-bottom:10px;}
+.counter-text{font-size:11px;color:var(--muted);letter-spacing:1px;}
+.btn-clear-done{background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;cursor:pointer;padding:5px 10px;font-family:inherit;transition:all 0.2s;font-weight:700;}
+.btn-clear-done:hover{border-color:var(--red);color:var(--red);}
+.btn-clear-all{background:none;border:none;color:var(--dim);font-size:11px;cursor:pointer;font-family:inherit;}
+.btn-clear-all:hover{color:var(--red);}
+
+/* ===== GASTOS ===== */
+.month-nav{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 16px;margin-bottom:14px;}
+.mnav-btn{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:2px 8px;font-family:inherit;transition:color 0.2s;}
+.mnav-btn:hover{color:var(--green);}
+.mnav-label{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#fff;}
+
+/* Month summary */
+.month-summary{background:linear-gradient(145deg,#0a1a0e,#060e08);border:1px solid #1a3020;border-radius:18px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden;}
+.month-summary::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,#4ade8018,transparent 70%);}
+.ms-label{font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:6px;}
+.ms-total{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:var(--green);line-height:1;}
+.ms-total span{font-size:22px;color:var(--green3);}
+.ms-stats{display:flex;gap:10px;margin-top:12px;}
+.ms-stat{flex:1;background:#060e08;border:1px solid var(--border);border-radius:10px;padding:10px;}
+.ms-stat-lbl{font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:3px;}
+.ms-stat-val{font-size:16px;font-weight:800;}
+
+/* Add expense */
+.add-expense-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;}
+.ae-title{font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;}
+.ae-row{display:flex;gap:8px;margin-bottom:8px;}
+.ae-input{flex:1;background:#060e08;border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit;outline:none;transition:border 0.2s;}
+.ae-input:focus{border-color:#4ade8044;}
+.ae-input.num{flex:0 0 100px;text-align:center;}
+
+/* Supermarket chips */
+.super-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.super-chip{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.super-chip.sel{color:#030e06;}
+
+.btn-add-expense{width:100%;background:var(--green2);border:none;border-radius:12px;color:#030e06;padding:12px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.2s;margin-top:4px;}
+.btn-add-expense:hover{opacity:0.85;}
+
+/* Expense list */
+.expense-list-card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:14px;}
+.el-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);}
+.el-title{font-size:10px;letter-spacing:2px;color:var(--muted);}
+.expense-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #0d1a10;transition:background 0.15s;}
+.expense-row:last-child{border-bottom:none;}
+.expense-row:hover{background:#0d1a10;}
+.exp-super-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.exp-info{flex:1;min-width:0;}
+.exp-super{font-size:13px;font-weight:700;}
+.exp-note{font-size:10px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.exp-date{font-size:10px;color:var(--muted);}
+.exp-amount{font-size:15px;font-weight:800;color:var(--green);white-space:nowrap;}
+.btn-del-exp{background:none;border:none;color:var(--dim);cursor:pointer;font-size:13px;padding:3px;border-radius:4px;transition:color 0.15s;}
+.btn-del-exp:hover{color:var(--red);}
+
+/* Comparison chart */
+.compare-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;}
+.cc-title{font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;}
+.compare-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.compare-month{font-size:11px;color:var(--muted);min-width:50px;}
+.compare-bar-bg{flex:1;height:8px;background:var(--dim);border-radius:4px;overflow:hidden;}
+.compare-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green3),var(--green));transition:width 0.6s cubic-bezier(.4,0,.2,1);}
+.compare-val{font-size:11px;font-weight:700;color:var(--green);min-width:55px;text-align:right;}
+
+#notif{position:fixed;top:16px;right:16px;z-index:999;background:#0a1a0e;border:1px solid #1a3020;color:var(--green);padding:10px 16px;border-radius:8px;font-size:12px;letter-spacing:1px;opacity:0;transform:translateY(-10px);transition:all 0.25s;pointer-events:none;}
+#notif.show{opacity:1;transform:translateY(0);}
+
+@media(max-width:400px){.add-input,.ae-input{font-size:16px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div id="notif"></div>
+
+<div class="header">
+  <div class="app-title">La <span>Compra</span></div>
+  <div class="app-sub">LISTA Y GASTOS</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" id="tab-lista" onclick="switchTab('lista')">🛒 Lista</button>
+  <button class="tab" id="tab-gastos" onclick="switchTab('gastos')">💰 Gastos</button>
+</div>
+
+<!-- ===== TAB LISTA ===== -->
+<div id="panel-lista">
+  <div class="add-row">
+    <input class="add-input" id="inp-item" type="text" placeholder="Añadir producto..." autocomplete="off"/>
+    <button class="btn-add-item" onclick="addItem()">+</button>
+  </div>
+
+  <!-- Quick suggestions -->
+  <div class="suggestions" id="suggestions"></div>
+
+  <!-- Counter -->
+  <div class="counter-bar">
+    <span class="counter-text" id="counter-text">0 productos</span>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn-clear-done" onclick="clearDone()">Borrar tachados</button>
+      <button class="btn-clear-all" onclick="clearAll()">Borrar todo</button>
+    </div>
+  </div>
+
+  <!-- Pending items -->
+  <div class="list-section">
+    <div class="list-section-title" id="pending-title" style="display:none">POR COMPRAR</div>
+    <div id="pending-list"></div>
+  </div>
+
+  <!-- Done items -->
+  <div class="list-section">
+    <div class="list-section-title" id="done-title" style="display:none">✓ COMPRADO</div>
+    <div id="done-list"></div>
+  </div>
+</div>
+
+<!-- ===== TAB GASTOS ===== -->
+<div id="panel-gastos" style="display:none">
+
+  <!-- Month nav -->
+  <div class="month-nav">
+    <button class="mnav-btn" onclick="changeExpMonth(-1)">‹</button>
+    <span class="mnav-label" id="exp-month-label">Mayo 2026</span>
+    <button class="mnav-btn" onclick="changeExpMonth(1)">›</button>
+  </div>
+
+  <!-- Summary -->
+  <div class="month-summary">
+    <div class="ms-label">GASTO DEL MES</div>
+    <div class="ms-total">€<span id="ms-int">0</span><span id="ms-dec">,00</span></div>
+    <div class="ms-stats">
+      <div class="ms-stat">
+        <div class="ms-stat-lbl">VISITAS</div>
+        <div class="ms-stat-val" style="color:var(--blue)" id="ms-visits">0</div>
+      </div>
+      <div class="ms-stat">
+        <div class="ms-stat-lbl">MEDIA/VISITA</div>
+        <div class="ms-stat-val" style="color:var(--purple)" id="ms-avg">€0</div>
+      </div>
+      <div class="ms-stat">
+        <div class="ms-stat-lbl">+ CARO</div>
+        <div class="ms-stat-val" style="color:var(--gold)" id="ms-max">€0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add expense -->
+  <div class="add-expense-card">
+    <div class="ae-title">AÑADIR COMPRA</div>
+    <div class="super-chips" id="super-chips"></div>
+    <div class="ae-row">
+      <input class="ae-input" id="inp-super" type="text" placeholder="Supermercado"/>
+      <input class="ae-input num" id="inp-exp-amount" type="number" min="0" step="0.01" placeholder="€"/>
+    </div>
+    <input class="ae-input" id="inp-exp-note" type="text" placeholder="Nota (opcional)" style="width:100%;margin-bottom:8px;"/>
+    <button class="btn-add-expense" onclick="addExpense()">+ Añadir gasto</button>
+  </div>
+
+  <!-- Expense list -->
+  <div class="expense-list-card">
+    <div class="el-header">
+      <span class="el-title">COMPRAS DEL MES</span>
+      <span style="font-size:10px;color:var(--dim)" id="exp-count">0</span>
+    </div>
+    <div id="expense-list"><div class="empty-list">Sin compras este mes</div></div>
+  </div>
+
+  <!-- Monthly comparison -->
+  <div class="compare-card">
+    <div class="cc-title">COMPARATIVA ANUAL</div>
+    <div id="compare-chart"></div>
+  </div>
+
+</div>
+
+</div>
+<script>
+const LIST_KEY = "lacompra_lista_v1";
+const EXP_KEY = "lacompra_gastos_v1";
+const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const MONTHS_SHORT = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const SUPERS = ["Mercadona","Lidl","Alcampo","Carrefour","Eroski","Dia","El Corte Inglés"];
+const SUPER_COLORS = ["#4ade80","#fbbf24","#60a5fa","#f472b6","#a78bfa","#fb923c","#2dd4bf","#f87171","#e879f9","#34d399"];
+const SUGGESTIONS = ["🥛 Leche","🍞 Pan","🥚 Huevos","🍅 Tomates","🍗 Pollo","🧀 Queso","🍌 Plátanos","🧻 Papel","🧴 Champú","☕ Café","🥩 Carne","🐟 Pescado","🧼 Jabón","🍝 Pasta","🛢️ Aceite"];
+
+let items = [];
+let expenses = {};
+let currentTab = "lista";
+let expYear = new Date().getFullYear();
+let expMonth = new Date().getMonth();
+let selectedSuper = "";
+let nextId = Date.now();
+let nt;
+
+function loadData(){
+  try{const r=localStorage.getItem(LIST_KEY);if(r)items=JSON.parse(r);}catch(e){}
+  try{const r=localStorage.getItem(EXP_KEY);if(r)expenses=JSON.parse(r);}catch(e){}
+}
+function saveList(){localStorage.setItem(LIST_KEY,JSON.stringify(items));}
+function saveExp(){localStorage.setItem(EXP_KEY,JSON.stringify(expenses));}
+function expKey(y,m){return`${y}_${m}`;}
+function getExpMonth(y,m){if(!expenses[expKey(y,m)])expenses[expKey(y,m)]=[];return expenses[expKey(y,m)];}
+
+function fmt(v,dec=2){return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR",minimumFractionDigits:dec,maximumFractionDigits:dec}).format(v);}
+function fmtParts(v){const s=new Intl.NumberFormat("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2}).format(v);const i=s.lastIndexOf(",");return i===-1?[s,"00"]:[s.slice(0,i),s.slice(i)];}
+
+function notify(msg,color){
+  const el=document.getElementById("notif");
+  el.textContent=msg;el.style.color=color||"var(--green)";
+  el.classList.add("show");clearTimeout(nt);
+  nt=setTimeout(()=>el.classList.remove("show"),2200);
+}
+
+function superColor(name){
+  const i=SUPERS.indexOf(name);
+  return i>=0?SUPER_COLORS[i]:SUPER_COLORS[Math.abs(name.charCodeAt(0))%SUPER_COLORS.length];
+}
+
+// ===== TAB =====
+function switchTab(tab){
+  currentTab=tab;
+  document.getElementById("panel-lista").style.display=tab==="lista"?"block":"none";
+  document.getElementById("panel-gastos").style.display=tab==="gastos"?"block":"none";
+  document.getElementById("tab-lista").className="tab"+(tab==="lista"?" active":"");
+  document.getElementById("tab-gastos").className="tab"+(tab==="gastos"?" active":"");
+  if(tab==="gastos")renderGastos();
+}
+
+// ===== LISTA =====
+function addItem(){
+  const val=document.getElementById("inp-item").value.trim();
+  if(!val)return;
+  items.unshift({id:nextId++,name:val,done:false});
+  saveList();
+  document.getElementById("inp-item").value="";
+  document.getElementById("inp-item").focus();
+  renderLista();
+}
+
+function addSuggestion(name){
+  const clean=name.replace(/^[\p{Emoji}\s]+/u,"").trim();
+  if(items.find(i=>i.name.toLowerCase()===clean.toLowerCase())){notify("Ya está en la lista","var(--gold)");return;}
+  items.unshift({id:nextId++,name:clean,done:false});
+  saveList();renderLista();
+}
+
+function toggleItem(id){
+  items=items.map(i=>i.id===id?{...i,done:!i.done}:i);
+  saveList();renderLista();
+}
+
+function deleteItem(id){
+  items=items.filter(i=>i.id!==id);
+  saveList();renderLista();
+}
+
+function clearDone(){
+  const n=items.filter(i=>i.done).length;
+  if(!n)return;
+  items=items.filter(i=>!i.done);
+  saveList();notify(`${n} producto${n>1?"s":""} eliminado${n>1?"s":""}`,"var(--muted)");renderLista();
+}
+
+function clearAll(){
+  if(!items.length)return;
+  if(!confirm("¿Borrar toda la lista?"))return;
+  items=[];saveList();renderLista();
+}
+
+function renderLista(){
+  const pending=items.filter(i=>!i.done);
+  const done=items.filter(i=>i.done);
+  const total=items.length;
+
+  document.getElementById("counter-text").textContent=
+    `${pending.length} por comprar${done.length?` · ${done.length} comprado${done.length>1?"s":""}`:""}`;
+
+  // Suggestions
+  const sugs=document.getElementById("suggestions");
+  sugs.innerHTML="";
+  SUGGESTIONS.filter(s=>!items.find(i=>i.name.toLowerCase()===s.replace(/^[\p{Emoji}\s]+/u,"").trim().toLowerCase()))
+    .slice(0,8).forEach(s=>{
+      const b=document.createElement("button");
+      b.className="sug-btn";b.textContent=s;
+      b.onclick=()=>addSuggestion(s);
+      sugs.appendChild(b);
+    });
+
+  // Pending
+  document.getElementById("pending-title").style.display=pending.length&&done.length?"block":"none";
+  const pl=document.getElementById("pending-list");
+  pl.innerHTML="";
+  if(!pending.length&&!done.length){
+    pl.innerHTML='<div class="empty-list">Lista vacía — añade productos arriba ↑</div>';
+  }
+  pending.forEach(item=>{
+    const row=document.createElement("div");
+    row.className="item-row";
+    row.innerHTML=`
+      <div class="item-check"></div>
+      <div class="item-name">${item.name}</div>
+      <button class="btn-del-item" onclick="event.stopPropagation();deleteItem(${item.id})">✕</button>
+    `;
+    row.onclick=()=>toggleItem(item.id);
+    pl.appendChild(row);
+  });
+
+  // Done
+  document.getElementById("done-title").style.display=done.length?"block":"none";
+  const dl=document.getElementById("done-list");
+  dl.innerHTML="";
+  done.forEach(item=>{
+    const row=document.createElement("div");
+    row.className="item-row done";
+    row.innerHTML=`
+      <div class="item-check">✓</div>
+      <div class="item-name">${item.name}</div>
+      <button class="btn-del-item" onclick="event.stopPropagation();deleteItem(${item.id})">✕</button>
+    `;
+    row.onclick=()=>toggleItem(item.id);
+    dl.appendChild(row);
+  });
+}
+
+// ===== GASTOS =====
+function changeExpMonth(d){
+  expMonth+=d;
+  if(expMonth<0){expMonth=11;expYear--;}
+  if(expMonth>11){expMonth=0;expYear++;}
+  renderGastos();
+}
+
+function renderSuperChips(){
+  const chips=document.getElementById("super-chips");
+  chips.innerHTML="";
+  SUPERS.forEach(s=>{
+    const c=document.createElement("button");
+    c.className="super-chip"+(s===selectedSuper?" sel":"");
+    if(s===selectedSuper)c.style.background=superColor(s);
+    c.textContent=s;
+    c.onclick=()=>{
+      selectedSuper=selectedSuper===s?"":s;
+      if(selectedSuper)document.getElementById("inp-super").value=s;
+      else document.getElementById("inp-super").value="";
+      renderSuperChips();
+    };
+    chips.appendChild(c);
+  });
+}
+
+function addExpense(){
+  const super_=document.getElementById("inp-super").value.trim();
+  const amount=parseFloat(document.getElementById("inp-exp-amount").value);
+  const note=document.getElementById("inp-exp-note").value.trim();
+  if(!super_||isNaN(amount)||amount<=0){notify("Pon supermercado e importe","var(--red)");return;}
+  const list=getExpMonth(expYear,expMonth);
+  const now=new Date();
+  list.push({id:nextId++,super:super_,amount,note,date:now.toLocaleDateString("es-ES",{day:"2-digit",month:"short"})});
+  saveExp();
+  document.getElementById("inp-super").value="";
+  document.getElementById("inp-exp-amount").value="";
+  document.getElementById("inp-exp-note").value="";
+  selectedSuper="";renderSuperChips();
+  notify(`${fmt(amount)} en ${super_} añadido ✓`);
+  renderGastos();
+}
+
+function deleteExpense(id){
+  const k=expKey(expYear,expMonth);
+  expenses[k]=expenses[k].filter(e=>e.id!==id);
+  saveExp();renderGastos();
+}
+
+function renderGastos(){
+  document.getElementById("exp-month-label").textContent=`${MONTHS[expMonth]} ${expYear}`;
+  renderSuperChips();
+
+  const list=getExpMonth(expYear,expMonth);
+  const total=list.reduce((a,e)=>a+e.amount,0);
+  const avg=list.length?total/list.length:0;
+  const max=list.length?Math.max(...list.map(e=>e.amount)):0;
+
+  const[i,d]=fmtParts(total);
+  document.getElementById("ms-int").textContent=i;
+  document.getElementById("ms-dec").textContent=d;
+  document.getElementById("ms-visits").textContent=list.length;
+  document.getElementById("ms-avg").textContent=fmt(avg,0);
+  document.getElementById("ms-max").textContent=fmt(max,0);
+  document.getElementById("exp-count").textContent=`${list.length} compra${list.length!==1?"s":""}`;
+
+  // Expense list
+  const el=document.getElementById("expense-list");
+  if(!list.length){el.innerHTML='<div class="empty-list">Sin compras este mes</div>';}
+  else{
+    el.innerHTML="";
+    [...list].reverse().forEach(e=>{
+      const row=document.createElement("div");
+      row.className="expense-row";
+      const color=superColor(e.super);
+      row.innerHTML=`
+        <div class="exp-super-dot" style="background:${color}"></div>
+        <div class="exp-info">
+          <div class="exp-super" style="color:${color}">${e.super}</div>
+          ${e.note?`<div class="exp-note">${e.note}</div>`:""}
+        </div>
+        <div class="exp-date">${e.date}</div>
+        <div class="exp-amount">${fmt(e.amount)}</div>
+        <button class="btn-del-exp" onclick="deleteExpense(${e.id})">✕</button>
+      `;
+      el.appendChild(row);
+    });
+  }
+
+  // Comparison chart (últimos 6 meses)
+  const chart=document.getElementById("compare-chart");
+  chart.innerHTML="";
+  const months=[];
+  for(let i=5;i>=0;i--){
+    let m=expMonth-i,y=expYear;
+    if(m<0){m+=12;y--;}
+    const t=getExpMonth(y,m).reduce((a,e)=>a+e.amount,0);
+    months.push({label:MONTHS_SHORT[m],total:t,isCurrent:m===expMonth&&y===expYear});
+  }
+  const maxT=Math.max(...months.map(m=>m.total),1);
+  months.forEach(m=>{
+    const row=document.createElement("div");
+    row.className="compare-row";
+    row.innerHTML=`
+      <div class="compare-month" style="${m.isCurrent?"color:var(--green);font-weight:800":""}">${m.label}</div>
+      <div class="compare-bar-bg">
+        <div class="compare-bar-fill" style="width:${(m.total/maxT)*100}%;${m.isCurrent?"background:linear-gradient(90deg,#16a34a,#4ade80)":""}"></div>
+      </div>
+      <div class="compare-val" style="${m.isCurrent?"color:var(--green)":""}">${m.total>0?fmt(m.total,0):"—"}</div>
+    `;
+    chart.appendChild(row);
+  });
+}
+
+document.getElementById("inp-item").addEventListener("keydown",e=>{if(e.key==="Enter")addItem();});
+document.getElementById("inp-exp-amount").addEventListener("keydown",e=>{if(e.key==="Enter")addExpense();});
+document.getElementById("inp-super").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("inp-exp-amount").focus();});
+
+loadData();renderLista();renderSuperChips();
+</script>
+</body>
+</html>
